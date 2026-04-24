@@ -37,10 +37,32 @@
         .res-val { font-weight: bold; font-size: 14px; }
 
         @media print {
-            .no-print { display: none; }
-            body { margin: 0; padding: 0; }
-            table { min-width: 100%; font-size: 11px; }
-            .bg-spiltag { background-color: var(--accent) !important; -webkit-print-color-adjust: exact; }
+            @page { size: portrait; margin: 0.5cm; }
+            .no-print { display: none !important; }
+            body { margin: 0; padding: 0; zoom: 75%; } 
+            .container { overflow: visible !important; }
+            table { 
+                min-width: 100% !important; 
+                width: 100% !important; 
+                table-layout: fixed !important;
+                font-size: 10px !important;
+            }
+            th, td { 
+                padding: 2px 1px !important; 
+                word-wrap: break-word !important;
+                overflow: visible !important;
+            }
+            .bg-spiltag { 
+                background-color: var(--accent) !important; 
+                -webkit-print-color-adjust: exact; 
+                color: white !important;
+            }
+            .bg-grey { 
+                background-color: var(--header-bg) !important; 
+                -webkit-print-color-adjust: exact; 
+            }
+            input { font-size: 10px !important; }
+            .editable { border: none !important; background: transparent !important; }
         }
     </style>
 </head>
@@ -55,11 +77,8 @@
         <table>
             <colgroup>
                 <col style="width: 15%;"> <col style="width: 11%;"> <col style="width: 5%;">  <col style="width: 5%;">  <col style="width: 4.5%;"><col style="width: 4.5%;"><col style="width: 4.5%;"><col style="width: 4.5%;"> 
-                
                 <col style="width: 4.5%;"><col style="width: 4.5%;"><col style="width: 4.5%;"><col style="width: 4.5%;"> 
-                
                 <col style="width: 6.0%;"><col style="width: 6.0%;"><col style="width: 6.0%;"> 
-                
                 </colgroup>
 
             <tr>
@@ -81,13 +100,13 @@
                 <td rowspan="2" colspan="2">
                     <input type="text" id="resp" value="JOÃO VICTOR PEDROSO DA SILVA" class="editable" style="font-weight: bold; font-size: 12px;">
                 </td>
-                <td class="bg-spiltag">SOMATÓRIA</td>
+                <td class="bg-spiltag">SOMA</td>
                 <td colspan="4" id="som_v" class="res-val">0.00</td>
                 <td colspan="4" id="som_0t" class="res-val">0.00</td>
                 <td colspan="3" id="som_10t" class="res-val">0.00</td>
             </tr>
             <tr>
-                <td class="bg-spiltag">DIFERENÇA</td>
+                <td class="bg-spiltag">DIF</td>
                 <td colspan="4" id="dif_v" class="res-val">0.00</td>
                 <td colspan="4" id="dif_0t" class="res-val">0.00</td>
                 <td colspan="3" id="dif_10t" class="res-val">0.00</td>
