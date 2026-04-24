@@ -290,6 +290,20 @@
         }
 
         function updateTime() { document.getElementById('current-time').innerText = new Date().toLocaleString(); }
+        // PROTEÇÃO DE ACESSO: USUÁRIO + SENHA
+        const usuarioCadastrado = "producao.spiltag"; 
+        const senhaCadastrada = "Spiltag@producao"; 
+
+        let user = prompt("Digite o Usuário:");
+        let pass = prompt("Digite a Senha:");
+
+        if (user === usuarioCadastrado && pass === senhaCadastrada) {
+            render(); // Só libera a planilha se os dois baterem
+        } else {
+            alert("Usuário ou Senha incorretos!");
+            document.body.innerHTML = "<h1 style='text-align:center; margin-top:50px; color:#a51c30;'>ACESSO NEGADO</h1>";
+            window.stop();
+        }
         render();
         setInterval(updateTime, 1000);
     </script>
