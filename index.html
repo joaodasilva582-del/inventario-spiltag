@@ -27,6 +27,7 @@
             border: 1px solid #aaa !important; border-radius: 6px !important; 
             box-sizing: border-box !important; font-size: 16px !important;
             background-color: #ffffff !important; display: block !important;
+            outline: none !important;
         }
         
         .btn-login {
@@ -35,6 +36,7 @@
             font-weight: bold; font-size: 16px; margin-top: 10px;
         }
 
+        /* CONTEÚDO PRINCIPAL */
         #app-content { display: none; padding: 5px; background-color: #fff; }
 
         .no-print { margin-bottom: 10px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 10px; }
@@ -51,38 +53,33 @@
         input[type="number"], input[type="text"] { width: 95%; border: none; text-align: center; background: transparent; font-size: 13px; font-weight: bold; }
         .res-val { font-weight: bold; font-size: 14px; }
 
-        /* --- CONFIGURAÇÃO PARA UMA FOLHA SÓ (PAISAGEM) --- */
+        /* --- AJUSTE PARA IMPRESSÃO EM MODO PAISAGEM --- */
         @media print {
             @page { 
-                size: landscape; 
-                margin: 0.3cm; /* Margem mínima para aproveitar a folha */
+                size: landscape; /* Força a impressora a deitar a folha */
+                margin: 0.5cm; /* Diminui as margens para ganhar espaço */
             }
-            html, body {
-                width: 297mm; /* Largura padrão A4 deitado */
-                height: 210mm;
-                background: white !important;
-            }
-            .no-print, #login-screen { display: none !important; }
+            
+            body { background: white !important; }
+            .no-print, #login-screen { display: none !important; } /* Esconde login e botões */
             #app-content { display: block !important; width: 100% !important; }
             .container { overflow: visible !important; width: 100% !important; }
             
             table { 
                 width: 100% !important; 
-                min-width: 100% !important;
-                zoom: 0.72; /* Escala exata para caber todos os itens em uma folha */
-                table-layout: fixed !important;
+                min-width: 100% !important; 
+                zoom: 0.75; /* Reduz levemente para caber tudo sem cortes laterais */
             }
             
             th, td { 
                 border: 1px solid #000 !important;
-                padding: 2px !important;
-                -webkit-print-color-adjust: exact;
+                -webkit-print-color-adjust: exact; /* Força as cores da Spiltag no PDF */
                 print-color-adjust: exact;
             }
             
             .bg-spiltag { background-color: #a51c30 !important; color: white !important; }
             .bg-grey { background-color: #e9e9e9 !important; }
-            input { font-size: 11px !important; }
+            input { border: none !important; background: transparent !important; }
         }
     </style>
 </head>
