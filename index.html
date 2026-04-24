@@ -12,26 +12,18 @@
 
     <style>
         :root { --border: #000; --header-bg: #e9e9e9; --accent: #a51c30; --btn-grey: #666666; --btn-blue: #0056b3; }
-        
         body { font-family: Arial, sans-serif; margin: 5px; font-size: 13px; color: #000; background-color: #fff; }
-        
         .no-print { margin-bottom: 10px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-        
         .btn-pdf { padding: 10px 18px; cursor: pointer; border: 1px solid #000; background-color: var(--accent); color: white; font-weight: bold; border-radius: 4px; font-size: 13px; }
         .btn-clear { padding: 10px 18px; cursor: pointer; border: 1px solid #000; background-color: var(--btn-grey); color: white; font-weight: bold; border-radius: 4px; font-size: 13px; }
         .btn-email { padding: 10px 18px; cursor: pointer; border: 1px solid #000; background-color: var(--btn-blue); color: white; font-weight: bold; border-radius: 4px; font-size: 13px; }
-        
         .container { width: 100%; max-width: 100%; overflow-x: auto; }
-        
         table { border-collapse: collapse; width: 100%; min-width: 1000px; table-layout: fixed; } 
         th, td { border: 1px solid var(--border); padding: 4px 2px; text-align: center; overflow: hidden; word-wrap: break-word; }
-        
         .bg-grey { background-color: var(--header-bg); font-weight: bold; }
         .bg-spiltag { background-color: var(--accent); color: white; font-weight: bold; }
-        
         input { width: 95%; border: none; text-align: center; background: transparent; font-size: 13px; font-family: inherit; font-weight: bold; color: inherit; }
         .editable { background-color: #fffdec; border: 1px solid #ccc !important; color: #000 !important; }
-        
         .logo-text { font-weight: bold; font-size: 20px; color: var(--accent); }
         .sub-cod { font-size: 11px; display: block; font-weight: normal; margin-top: 2px; color: #f0f0f0; }
         .res-val { font-weight: bold; font-size: 14px; }
@@ -41,26 +33,10 @@
             .no-print { display: none !important; }
             body { margin: 0; padding: 0; zoom: 75%; } 
             .container { overflow: visible !important; }
-            table { 
-                min-width: 100% !important; 
-                width: 100% !important; 
-                table-layout: fixed !important;
-                font-size: 10px !important;
-            }
-            th, td { 
-                padding: 2px 1px !important; 
-                word-wrap: break-word !important;
-                overflow: visible !important;
-            }
-            .bg-spiltag { 
-                background-color: var(--accent) !important; 
-                -webkit-print-color-adjust: exact; 
-                color: white !important;
-            }
-            .bg-grey { 
-                background-color: var(--header-bg) !important; 
-                -webkit-print-color-adjust: exact; 
-            }
+            table { min-width: 100% !important; width: 100% !important; table-layout: fixed !important; font-size: 10px !important; }
+            th, td { padding: 2px 1px !important; word-wrap: break-word !important; overflow: visible !important; }
+            .bg-spiltag { background-color: var(--accent) !important; -webkit-print-color-adjust: exact; color: white !important; }
+            .bg-grey { background-color: var(--header-bg) !important; -webkit-print-color-adjust: exact; }
             input { font-size: 10px !important; }
             .editable { border: none !important; background: transparent !important; }
         }
@@ -80,7 +56,7 @@
                 <col style="width: 15%;"> <col style="width: 11%;"> <col style="width: 5%;">  <col style="width: 5%;">  <col style="width: 4.5%;"><col style="width: 4.5%;"><col style="width: 4.5%;"><col style="width: 4.5%;"> 
                 <col style="width: 4.5%;"><col style="width: 4.5%;"><col style="width: 4.5%;"><col style="width: 4.5%;"> 
                 <col style="width: 6.0%;"><col style="width: 6.0%;"><col style="width: 6.0%;"> 
-                </colgroup>
+            </colgroup>
 
             <tr>
                 <td rowspan="4" class="logo-text">SPILTAG</td>
@@ -205,7 +181,6 @@
                     }
                 }
             }, true);
-            updateTime();
         }
 
         function unck(el) { document.getElementsByName(el.name).forEach(c => { if(c !== el) c.checked = false; }); }
@@ -246,28 +221,32 @@
             document.getElementById('dif_10t').innerText = (t10 - s10).toFixed(2);
         }
 
+        function limparCampos() {
+            if (confirm("Deseja realmente zerar todos os campos do inventário?")) {
+                document.querySelectorAll('.peso').forEach(input => input.value = "");
+                document.querySelectorAll('input[type="checkbox"]').forEach(chk => chk.checked = false);
+                document.getElementById('sys_v').value = 0;
+                document.getElementById('sys_0t').value = 0;
+                document.getElementById('sys_10t').value = 0;
+                calc();
+                alert("Campos zerados com sucesso!");
+            }
+        }
+
         function enviarEmail() {
             const responsavel = document.getElementById('resp').value;
             const dataHora = document.getElementById('current-time').innerText;
-            
-            // Valores Físicos
             const totV = document.getElementById('tot_v').innerText;
             const tot0 = document.getElementById('tot_0t').innerText;
             const tot10 = document.getElementById('tot_10t').innerText;
-            
-            // Valores Sistema
             const sysV = document.getElementById('sys_v').value || "0";
             const sys0 = document.getElementById('sys_0t').value || "0";
             const sys10 = document.getElementById('sys_10t').value || "0";
-            
-            // Diferenças
             const difV = document.getElementById('dif_v').innerText;
             const dif0 = document.getElementById('dif_0t').innerText;
             const dif10 = document.getElementById('dif_10t').innerText;
-
             const destinatario = "joao.pedroso@spiltag.com"; 
             const assunto = `Resumo de Inventário - ${responsavel}`;
-            
             const corpo = `Relatório de Inventário de Resinas%0D%0A` +
                           `Data/Hora: ${dataHora}%0D%0A` +
                           `Responsável: ${responsavel}%0D%0A%0D%0A` +
@@ -285,12 +264,31 @@
                           `- Diferença: ${dif10} KG%0D%0A%0D%0A` +
                           `-------------------------------------------%0D%0A` +
                           `Enviado via App Inventário Spiltag.`;
-
             window.location.href = `mailto:${destinatario}?subject=${assunto}&body=${corpo}`;
         }
 
         function updateTime() { document.getElementById('current-time').innerText = new Date().toLocaleString(); }
-        // PROTEÇÃO DE ACESSO: USUÁRIO + SENHA
+
+      // --- SISTEMA DE INATIVIDADE (20 MINUTOS) ---
+        let tempoInatividade;
+        function resetTimer() {
+            clearTimeout(tempoInatividade);
+            // 20 minutos = 1.200.000 milissegundos
+            tempoInatividade = setTimeout(() => {
+                alert("Sessão expirada por inatividade. Por favor, faça login novamente.");
+                location.reload(); 
+            }, 1200000); 
+        }
+
+        // Monitora cliques, teclas e toques para reiniciar a contagem
+        window.onload = resetTimer;
+        window.onmousemove = resetTimer;
+        window.onmousedown = resetTimer; 
+        window.ontouchstart = resetTimer;
+        window.onclick = resetTimer;     
+        window.onkeydown = resetTimer;   
+
+        // --- PROTEÇÃO DE ACESSO ---
         const usuarioCadastrado = "producao"; 
         const senhaCadastrada = "Spil@2026"; 
 
@@ -298,16 +296,13 @@
         let pass = prompt("Digite a Senha:");
 
         if (user === usuarioCadastrado && pass === senhaCadastrada) {
-            render(); // Só libera a planilha se os dois baterem
+            render();
+            setInterval(updateTime, 1000);
         } else {
             alert("Usuário ou Senha incorretos!");
             document.body.innerHTML = "<h1 style='text-align:center; margin-top:50px; color:#a51c30;'>ACESSO NEGADO</h1>";
             window.stop();
         }
-    render();
-    setInterval(updateTime, 1000);
-        render();
-        setInterval(updateTime, 1000);
     </script>
 </body>
 </html>
