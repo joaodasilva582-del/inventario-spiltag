@@ -71,7 +71,7 @@
     <div class="no-print">
         <button class="btn-pdf" onclick="window.print()">GERAR PDF / IMPRIMIR</button>
         <button class="btn-email" onclick="enviarEmail()">ENVIAR TOTAIS POR E-MAIL</button>
-        <button class="btn-clear" onclick="location.reload()">LIMPAR TUDO</button>
+        <button class="btn-clear" onclick="limparCampos()">LIMPAR TUDO</button>
     </div>
 
     <div class="container">
@@ -304,6 +304,23 @@
             document.body.innerHTML = "<h1 style='text-align:center; margin-top:50px; color:#a51c30;'>ACESSO NEGADO</h1>";
             window.stop();
         }
+        // ... (resto do código anterior)
+    }
+
+    function limparCampos() {
+        if (confirm("Deseja realmente zerar todos os campos do inventário?")) {
+            document.querySelectorAll('.peso').forEach(input => input.value = "");
+            document.querySelectorAll('input[type="checkbox"]').forEach(chk => chk.checked = false);
+            document.getElementById('sys_v').value = 0;
+            document.getElementById('sys_0t').value = 0;
+            document.getElementById('sys_10t').value = 0;
+            calc();
+            alert("Campos zerados com sucesso!");
+        }
+    }
+
+    render();
+    setInterval(updateTime, 1000);
         render();
         setInterval(updateTime, 1000);
     </script>
