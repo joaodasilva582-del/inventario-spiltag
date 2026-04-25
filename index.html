@@ -91,7 +91,10 @@
 
             th, td { 
                 border: 1px solid #000 !important;
-                -webkit-print-color-adjust: exact; 
+                padding: 0px 2px !important; /* Diminuído para o texto ocupar menos altura */
+                font-size: 10px !important;   /* Letra menor apenas na impressão */
+                line-height: 1.0 !important;  /* Colado uma linha na outra */
+                -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
 
