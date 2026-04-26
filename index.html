@@ -2,12 +2,17 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Inventário">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
     <title>Inventário Spiltag</title>
     
     <style>
         :root { --border: #000; --header-bg: #e9e9e9; --accent: #a51c30; --btn-grey: #666666; --btn-blue: #0056b3; }
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; overflow-x: hidden; }
 
         /* TELA DE LOGIN */
         #login-screen {
@@ -19,7 +24,7 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 350px;
             text-align: center; border-top: 6px solid var(--accent);
         }
-        .login-box h1 { color: var(--accent); margin: 0 0 5px 0; font-size: 28px; letter-spacing: 2px; font-weight: bold; }
+        .login-box h1 { color: var(--accent); margin: 0 0 5px 0; font-size: 32px; letter-spacing: 2px; font-weight: bold; }
         .login-box p { font-size: 12px; color: #666; margin-bottom: 20px; font-weight: bold; }
         
         .login-box input {
@@ -27,7 +32,7 @@
             border: 1px solid #aaa !important; border-radius: 6px !important; 
             box-sizing: border-box !important; font-size: 16px !important;
             background-color: #ffffff !important; display: block !important;
-            outline: none !important;
+            outline: none !important; text-align: center;
         }
         
         .btn-login {
@@ -38,7 +43,6 @@
 
         /* CONTEÚDO PRINCIPAL */
         #app-content { display: none; padding: 5px; background-color: #fff; }
-
         .no-print { margin-bottom: 10px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 10px; }
         .btn-pdf { padding: 10px 18px; cursor: pointer; border: 1px solid #000; background-color: var(--accent); color: white; font-weight: bold; border-radius: 4px; }
         .btn-clear { padding: 10px 18px; cursor: pointer; border: 1px solid #000; background-color: var(--btn-grey); color: white; font-weight: bold; border-radius: 4px; }
@@ -55,7 +59,7 @@
 
         /* MODAL DE AVISO PERSONALIZADO */
         #custom-alert {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; position: fixed; top: 0; left: any; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;
         }
         .alert-content {
@@ -70,20 +74,13 @@
         .btn-alert-ok { background: var(--accent); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 15px; }
         .btn-alert-cancel { background: var(--btn-grey); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 15px; }
 
-        /* ESTILOS DE LOGO E CÓDIGOS */
         .logo-text { font-weight: bold; font-size: 30px !important; color: var(--accent) !important; }
         .sub-cod { font-size: 10px !important; font-weight: normal !important; color: #ddd !important; display: block; }
 
         @media print {
-            @page { size: portrait; margin: 0.5cm; }
             .no-print, #login-screen, #custom-alert { display: none !important; }
-            body { margin: 0; padding: 0; zoom: 75%; } 
-            .container { overflow: visible !important; }
-            table { min-width: 100% !important; width: 100% !important; table-layout: fixed !important; font-size: 10px !important; }
-            th, td { padding: 2px 1px !important; border: 1px solid #000 !important; }
-            .bg-spiltag { background-color: var(--accent) !important; -webkit-print-color-adjust: exact; color: white !important; }
-            .bg-grey { background-color: var(--header-bg) !important; -webkit-print-color-adjust: exact; }
-            .sub-cod { color: white !important; -webkit-print-color-adjust: exact; font-size: 9px !important; }
+            body { zoom: 75%; } 
+            table { width: 100% !important; min-width: 100% !important; }
         }
     </style>
 </head>
@@ -222,14 +219,13 @@
         }
 
         function fecharAlerta() { document.getElementById('custom-alert').style.display = 'none'; }
-        function confirmarLimpeza() { mostrarAlerta("Deseja realmente limpar todos os dados do inventário? Essa ação não pode ser desfeita.", 'confirmar'); }
+        function confirmarLimpeza() { mostrarAlerta("Deseja realmente limpar todos os dados?", 'confirmar'); }
         function executarLimpeza() {
             document.querySelectorAll('.peso').forEach(i => i.value = "");
             document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
             document.getElementById('sys_v').value = document.getElementById('sys_0t').value = document.getElementById('sys_10t').value = "";
             document.getElementById('resp').value = "";
-            calc();
-            fecharAlerta();
+            calc(); fecharAlerta();
         }
 
         function render() {
@@ -254,7 +250,16 @@
             if (event.key === "Enter") {
                 event.preventDefault();
                 if (nextId) document.getElementById(nextId).focus();
-                else { calc(); const sV = document.getElementById('sys_v').value; const s0 = document.getElementById('sys_0t').value; const s10 = document.getElementById('sys_10t').value; if (!sV || !s0 || !s10) { mostrarAlerta("Contagem finalizada! Agora informe o Saldo no Sistema no topo da tabela."); window.scrollTo({top: 0, behavior: 'smooth'}); } else { mostrarAlerta("Contagem finalizada com sucesso!"); } }
+                else { 
+                    calc(); 
+                    const sV = document.getElementById('sys_v').value; 
+                    const s0 = document.getElementById('sys_0t').value; 
+                    const s10 = document.getElementById('sys_10t').value; 
+                    if (!sV || !s0 || !s10) { 
+                        mostrarAlerta("Contagem finalizada! Agora informe o Saldo no Sistema no topo da tabela."); 
+                        window.scrollTo({top: 0, behavior: 'smooth'}); 
+                    } 
+                }
             }
         }
 
@@ -319,10 +324,9 @@
             const sysV = document.getElementById('sys_v').value;
             const sys0 = document.getElementById('sys_0t').value;
             const sys10 = document.getElementById('sys_10t').value;
-            if (!resp) { mostrarAlerta("Preencha o seu nome no campo Responsável."); return; }
-            if (!sysV || !sys0 || !sys10) { mostrarAlerta("Preencha os três saldos do sistema no topo da tabela."); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
+            if (!resp || !sysV || !sys0 || !sys10) { mostrarAlerta("Preencha o nome e todos os saldos do sistema."); return; }
             let fP = false; document.querySelectorAll('.peso').forEach(i => { if (i.value === "") fP = true; });
-            if (fP) { mostrarAlerta("Existem pontos de contagem sem peso informado na tabela."); return; }
+            if (fP) { mostrarAlerta("Complete todos os pesos na tabela."); return; }
             const dt = document.getElementById('current-time').innerText;
             const tV = document.getElementById('tot_v').innerText;
             const t0 = document.getElementById('tot_0t').innerText;
