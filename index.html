@@ -242,8 +242,8 @@
                 tr.innerHTML = `
                     <td style="text-align:left;">${it.p}</td><td>${it.l}</td><td>${it.c}</td>
                     <td><input type="number" class="peso editable" id="peso-${i}" oninput="calc()" onkeydown="handleEnter(event, ${nextId ? `'${nextId}'` : 'null'})" placeholder=""></td>
-                    ${[25,50,75,100].map(v => `<td><input type="checkbox" name="m${i}" onclick="unck(this);calc()" data-type="0t" data-val="${v}" ${!isMix?'disabled':''}></td>`).join('')}
-                    ${[25,50,75,100].map(v => `<td><input type="checkbox" name="m${i}" onclick="unck(this);calc()" data-type="10t" data-val="${v}" ${!isMix?'disabled':''}></td>`).join('')}
+                    ${[25,50,75,100].map(v => `<td><input type="checkbox" name="m${i}" onclick="unck(this, ${i});calc()" data-type="0t" data-val="${v}" ${!isMix?'disabled':''}></td>`).join('')}
+                    ${[25,50,75,100].map(v => `<td><input type="checkbox" name="m${i}" onclick="unck(this, ${i});calc()" data-type="10t" data-val="${v}" ${!isMix?'disabled':''}></td>`).join('')}
                     <td class="rv">0.0</td><td class="r0">0.0</td><td class="r10">0.0</td>
                 `;
                 body.appendChild(tr);
@@ -253,26 +253,20 @@
         function handleEnter(event, nextId) {
             if (event.key === "Enter") {
                 event.preventDefault();
-                if (nextId) {
-                    document.getElementById(nextId).focus();
-                } else {
-                    calc();
-                    // VERIFICAÇÃO NO FINAL DA TABELA
-                    const sysV = document.getElementById('sys_v').value;
-                    const sys0 = document.getElementById('sys_0t').value;
-                    const sys10 = document.getElementById('sys_10t').value;
-
-                    if (!sysV || !sys0 || !sys10) {
-                        mostrarAlerta("Contagem de peso finalizada! Agora, por favor, informe o Saldo no Sistema das três resinas no topo da tabela.");
-                        window.scrollTo({top: 0, behavior: 'smooth'});
-                    } else {
-                        mostrarAlerta("Contagem finalizada com sucesso! Todos os dados foram preenchidos.");
-                    }
-                }
+                if (nextId) document.getElementById(nextId).focus();
+                else { calc(); const sV = document.getElementById('sys_v').value; const s0 = document.getElementById('sys_0t').value; const s10 = document.getElementById('sys_10t').value; if (!sV || !s0 || !s10) { mostrarAlerta("Contagem finalizada! Agora informe o Saldo no Sistema no topo da tabela."); window.scrollTo({top: 0, behavior: 'smooth'}); } else { mostrarAlerta("Contagem finalizada com sucesso!"); } }
             }
         }
 
-        function unck(el) { document.getElementsByName(el.name).forEach(c => { if(c !== el) c.checked = false; }); }
+        function unck(el, index) { 
+            const pesoInput = document.getElementById(`peso-${index}`);
+            if (el.checked && (!pesoInput.value || parseFloat(pesoInput.value) <= 0)) {
+                el.checked = false;
+                mostrarAlerta("Informe o peso encontrado neste ponto antes de selecionar a porcentagem do Mix.");
+                return;
+            }
+            document.getElementsByName(el.name).forEach(c => { if(c !== el) c.checked = false; }); 
+        }
 
         function calc() {
             let tV = 0, t0 = 0, t10 = 0;
@@ -296,18 +290,14 @@
             document.getElementById('tot_v').innerText = document.getElementById('som_v').innerText = tV.toFixed(2);
             document.getElementById('tot_0t').innerText = document.getElementById('som_0t').innerText = t0.toFixed(2);
             document.getElementById('tot_10t').innerText = document.getElementById('som_10t').innerText = t10.toFixed(2);
-            
             const sysV = parseFloat(document.getElementById('sys_v').value) || 0;
             const sys0 = parseFloat(document.getElementById('sys_0t').value) || 0;
             const sys10 = parseFloat(document.getElementById('sys_10t').value) || 0;
-
-            const difV = tV - sysV; const dif0 = t0 - sys0; const dif10 = t10 - sys10;
-
-            document.getElementById('dif_v').innerText = difV.toFixed(2);
-            document.getElementById('dif_0t').innerText = dif0.toFixed(2);
-            document.getElementById('dif_10t').innerText = dif10.toFixed(2);
-
-            [ {id:'dif_v', v:difV}, {id:'dif_0t', v:dif0}, {id:'dif_10t', v:dif10} ].forEach(d => {
+            const dV = tV - sysV; const d0 = t0 - sys0; const d10 = t10 - sys10;
+            document.getElementById('dif_v').innerText = dV.toFixed(2);
+            document.getElementById('dif_0t').innerText = d0.toFixed(2);
+            document.getElementById('dif_10t').innerText = d10.toFixed(2);
+            [ {id:'dif_v', v:dV}, {id:'dif_0t', v:d0}, {id:'dif_10t', v:d10} ].forEach(d => {
                 const el = document.getElementById(d.id);
                 el.style.color = d.v < 0 ? '#d00000' : (d.v > 0 ? '#008000' : '#000');
             });
@@ -329,49 +319,20 @@
             const sysV = document.getElementById('sys_v').value;
             const sys0 = document.getElementById('sys_0t').value;
             const sys10 = document.getElementById('sys_10t').value;
-            
             if (!resp) { mostrarAlerta("Preencha o seu nome no campo Responsável."); return; }
-            if (!sysV || !sys0 || !sys10) { 
-                mostrarAlerta("Preencha os três saldos do sistema no topo da tabela."); 
-                window.scrollTo({top: 0, behavior: 'smooth'});
-                return; 
-            }
-
-            let faltaPeso = false;
-            document.querySelectorAll('.peso').forEach(input => { if (input.value === "") faltaPeso = true; });
-            if (faltaPeso) { 
-                mostrarAlerta("Existem pontos de contagem sem peso informado na tabela. Por favor, complete todos os campos."); 
-                return; 
-            }
-
-            const dataHora = document.getElementById('current-time').innerText;
-            const totV = document.getElementById('tot_v').innerText;
-            const tot0 = document.getElementById('tot_0t').innerText;
-            const tot10 = document.getElementById('tot_10t').innerText;
-            const difV = document.getElementById('dif_v').innerText;
-            const dif0 = document.getElementById('dif_0t').innerText;
-            const dif10 = document.getElementById('dif_10t').innerText;
-
-            const assunto = `Resumo de Inventário - ${resp}`;
-            const corpo = `Relatório de Inventário de Resinas%0D%0A` +
-                          `Data/Hora: ${dataHora}%0D%0A` +
-                          `Responsável: ${resp}%0D%0A%0D%0A` +
-                          `1. PET VIRGEM (0010006)%0D%0A` +
-                          `- Físico: ${totV} KG%0D%0A` +
-                          `- Sistema: ${sysV} KG%0D%0A` +
-                          `- Diferença: ${difV} KG%0D%0A%0D%0A` +
-                          `2. PCR 0T (0010048)%0D%0A` +
-                          `- Físico: ${tot0} KG%0D%0A` +
-                          `- Sistema: ${sys0} KG%0D%0A` +
-                          `- Diferença: ${dif0} KG%0D%0A%0D%0A` +
-                          `3. PCR 10T (0010030)%0D%0A` +
-                          `- Físico: ${tot10} KG%0D%0A` +
-                          `- Sistema: ${sys10} KG%0D%0A` +
-                          `- Diferença: ${dif10} KG%0D%0A%0D%0A` +
-                          `-------------------------------------------%0D%0A` +
-                          `Enviado via App Inventário Spiltag.`;
-
-            window.location.href = `mailto:joao.pedroso@spiltag.com?subject=${encodeURIComponent(assunto)}&body=${corpo}`;
+            if (!sysV || !sys0 || !sys10) { mostrarAlerta("Preencha os três saldos do sistema no topo da tabela."); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
+            let fP = false; document.querySelectorAll('.peso').forEach(i => { if (i.value === "") fP = true; });
+            if (fP) { mostrarAlerta("Existem pontos de contagem sem peso informado na tabela."); return; }
+            const dt = document.getElementById('current-time').innerText;
+            const tV = document.getElementById('tot_v').innerText;
+            const t0 = document.getElementById('tot_0t').innerText;
+            const t10 = document.getElementById('tot_10t').innerText;
+            const dV = document.getElementById('dif_v').innerText;
+            const d0 = document.getElementById('dif_0t').innerText;
+            const d10 = document.getElementById('dif_10t').innerText;
+            const ass = `Resumo de Inventário - ${resp}`;
+            const corpo = `Relatório de Inventário de Resinas%0D%0AData/Hora: ${dt}%0D%0AResponsável: ${resp}%0D%0A%0D%0A1. PET VIRGEM (0010006)%0D%0A- Físico: ${tV} KG%0D%0A- Sistema: ${sysV} KG%0D%0A- Diferença: ${dV} KG%0D%0A%0D%0A2. PCR 0T (0010048)%0D%0A- Físico: ${t0} KG%0D%0A- Sistema: ${sys0} KG%0D%0A- Diferença: ${d0} KG%0D%0A%0D%0A3. PCR 10T (0010030)%0D%0A- Físico: ${t10} KG%0D%0A- Sistema: ${sys10} KG%0D%0A- Diferença: ${d10} KG%0D%0A%0D%0A-------------------------------------------%0D%0AEnviado via App Inventário Spiltag.`;
+            window.location.href = `mailto:joao.pedroso@spiltag.com?subject=${encodeURIComponent(ass)}&body=${corpo}`;
         }
     </script>
 </body>
