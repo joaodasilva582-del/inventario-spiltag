@@ -253,8 +253,22 @@
         function handleEnter(event, nextId) {
             if (event.key === "Enter") {
                 event.preventDefault();
-                if (nextId) document.getElementById(nextId).focus();
-                else { calc(); window.scrollTo({top: 0, behavior: 'smooth'}); }
+                if (nextId) {
+                    document.getElementById(nextId).focus();
+                } else {
+                    calc();
+                    // VERIFICAÇÃO NO FINAL DA TABELA
+                    const sysV = document.getElementById('sys_v').value;
+                    const sys0 = document.getElementById('sys_0t').value;
+                    const sys10 = document.getElementById('sys_10t').value;
+
+                    if (!sysV || !sys0 || !sys10) {
+                        mostrarAlerta("Contagem de peso finalizada! Agora, por favor, informe o Saldo no Sistema das três resinas no topo da tabela.");
+                        window.scrollTo({top: 0, behavior: 'smooth'});
+                    } else {
+                        mostrarAlerta("Contagem finalizada com sucesso! Todos os dados foram preenchidos.");
+                    }
+                }
             }
         }
 
