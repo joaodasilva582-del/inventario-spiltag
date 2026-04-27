@@ -1,8 +1,14 @@
-self.addEventListener('fetch', () => {});
-self.addEventListener('install', event => {
-  self.skipWaiting();
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open('spiltag-store').then((cache) => cache.addAll([
+      'index.html',
+      'manifest.json'
+    ]))
+  );
 });
- 
-self.addEventListener('activate', event => {
-  event.waitUntil(clients.claim());
+
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    caches.match(e.request).then((response) => response || fetch(e.request))
+  );
 });
